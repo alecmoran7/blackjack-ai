@@ -1,4 +1,4 @@
-package mechanics;
+package org.mechanics;
 
 public class Card {
 

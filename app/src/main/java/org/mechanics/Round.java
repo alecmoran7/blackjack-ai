@@ -1,4 +1,4 @@
-package mechanics;
+package org.mechanics;
 
 import java.sql.Array;
 import java.util.*;

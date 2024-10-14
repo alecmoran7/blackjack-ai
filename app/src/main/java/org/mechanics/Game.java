@@ -1,4 +1,4 @@
-package mechanics;
+package org.mechanics;
 public class Game {
 
     Deck deck = new Deck();
@@ -49,6 +49,7 @@ public class Game {
 
 
     public static void main(String[] args){
+        System.out.println("Starting game");
         Game game = new Game();
 
     }

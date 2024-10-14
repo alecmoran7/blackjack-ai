@@ -1,4 +1,4 @@
-package mechanics;
+package org.mechanics;
 
 import java.util.ArrayList;
 import java.util.List;

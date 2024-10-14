@@ -1,4 +1,4 @@
-package mechanics;
+package org.mechanics;
 enum Cardholder {
     Player, Dealer;
 
