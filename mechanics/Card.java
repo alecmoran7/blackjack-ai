@@ -12,7 +12,7 @@ public class Card {
        this.name = name;
        this.icon = icon;
        this.isAce = isAce;
-       this.cardValue = -1; // Avoid calling getCardValue() on aces (because they have two values)
+       this.cardValue = -1; // this makes sure aces get both 1 and 11 set as card values
     }
 
     public Card(String name, String icon, int cardValue){
@@ -41,13 +41,11 @@ public class Card {
 
     public int getCardValue() {
         if (this.isAce()){
-            System.err.println("Cannot call getCardValue() on an Ace card");
-            System.exit(1);
+            return 11;
         }
         else {
             return cardValue;
         }
-        return -1;
     }
 
     public void print(){
