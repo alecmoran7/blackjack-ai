@@ -31,11 +31,8 @@ public class Hand {
     }
 
     public void showAllCards() {
-        int totalValue = 0;
-        int secondTotalValue = 0;
         boolean containsAce = false;
         ArrayList<String> cardIcons = new ArrayList<String>();
-        int cardNum = 0;
         for (Card c : cards) {
             cardIcons.add(c.getIcon());
             if (c.isAce()) {
