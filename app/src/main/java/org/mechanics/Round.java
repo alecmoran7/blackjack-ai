@@ -6,7 +6,7 @@ import java.util.*;
 public class Round {
     private Deck deck;
 
-    //TODO: Allow changing of this variable
+    // Change this variable to toggle between manual and automatic play
     private boolean automateGame = true;
 
     double playerCash;
@@ -92,9 +92,6 @@ public class Round {
         initializeRound();
 
         showDealerUpCard();
-        ArrayList<Integer> dealersCardsTotalValues = dealerHand.getTotalHandValue();
-        ArrayList<Integer> playersCardsTotalValues;
-
         playerHands.add(playerPrimaryHand);
         playHand(playerPrimaryHand);
         if (playerSplitHand != null){
@@ -108,24 +105,6 @@ public class Round {
         Card newCard = deck.getCard();
         System.out.println("Hit -> " + newCard.getIcon());
         handToHit.addCard(newCard);
-    }
-
-    public boolean playerHasBlackJack(Hand playerHand) {
-        return playerHand.hasBlackJack();
-    }
-
-    public boolean dealerHasBlackJack() {
-        if (dealerCards.getFirst().isAce() && !dealerCards.getLast().isAce()){
-            if (dealerCards.getLast().getCardValue() == 10){
-                return true;
-            }
-        }
-        if (dealerCards.getLast().isAce() && !dealerCards.getFirst().isAce()){
-            if (dealerCards.getFirst().getCardValue() == 10){
-                return true;
-            }
-        }
-        return false;
     }
 
     public ArrayList<Integer> getTotalHandValue(Cardholder cardHolder){
@@ -165,7 +144,7 @@ public class Round {
         playerHand.showAllCards();
 
         ArrayList<Integer> playersCardsTotalValues = playerHand.getTotalHandValue();
-        ArrayList<Integer> dealersCardsTotalValues = dealerHand.getTotalHandValue();
+        boolean firstMove = true;
 
         while (true) {
             Strategy playerStrategy = new Strategy(playerHand, dealerHand);
@@ -177,8 +156,24 @@ public class Round {
                 playerHand.setHandStatus(Hand.Status.BLACKJACK);
                 break;
             }
-            else if (input.contains("h")) {
+
+            if (input.contains("d")) {
+                if (!firstMove) {
+                    input = "h";
+                    System.out.println("Optimal move with these cards is double, however doubling not allowed after first hit");
+                }
+                else {
+                    this.doubledDown = true;
+                    hit(playerHand);
+                    playersCardsTotalValues = playerHand.getTotalHandValue();
+                    Collections.sort(playersCardsTotalValues);
+                    System.out.println("Player doubled down with : " + getBestValueFromHand(playersCardsTotalValues));
+                    break;
+                }
+            }
+            if (input.contains("h")) {
                 hit(playerHand);
+                firstMove = false;
                 playerHand.showAllCards();
                 playersCardsTotalValues = playerHand.getTotalHandValue();
                 Collections.sort(playersCardsTotalValues);
@@ -190,20 +185,12 @@ public class Round {
                     System.out.println("Player busted with value: " + playersCardsTotalValues.getFirst());
                     playerHand.setHandStatus(Hand.Status.BUSTED);
                     break;
-                }
-            } else if (input.contains("d")) {
-                this.doubledDown = true;
-                hit(playerHand);
-                playersCardsTotalValues = playerHand.getTotalHandValue();
-                Collections.sort(playersCardsTotalValues);
-                System.out.println("Player doubled down with : " + getBestValueFromHand(playersCardsTotalValues));
-                break;
-            } else if (input.contains("s")) {
+                    }
+            }  else if (input.contains("s")) {
                 System.out.println("Player stands with " + getBestValueFromHand(playersCardsTotalValues));
                 playerHand.setHandStatus(Hand.Status.STAND);
                 break;
             } else if (input.contains("p")) {
-                //TODO Split into two hands
                 if (playerHands.size() == 1 && playerHand.getCards().size() == 2){
 
                     Vector<Card> secondHandCards = new Vector<Card>();
@@ -222,7 +209,6 @@ public class Round {
     }
 
     private double compareToDealerHand(Vector<Hand> playerHands){
-        String input;
         boolean playerBusted = false;
         if (playerHands.getFirst().getHandStatus() == Hand.Status.BUSTED && playerHands.getLast().getHandStatus() == Hand.Status.BUSTED){
             playerBusted = true;
@@ -239,11 +225,10 @@ public class Round {
                     Collections.sort(dealersCardsTotalValues);
                     continue;
                 }
-                //TODO: iterate through all values in dealer's soft totals
+                //TODO: iterate through all values in dealer's soft totals if H17 is implemented in future
                 for (Integer totalValue : dealersCardsTotalValues) {
                     if (totalValue >= 17 && totalValue <= 21) {
                         System.out.println("Dealer stands at " + getBestValueFromHand(dealersCardsTotalValues));
-                        input = "s"; // Automatically force player to stand between 17 and 21
                         dealerHand.setHandStatus(Hand.Status.STAND);
                         break;
                     }
@@ -256,8 +241,6 @@ public class Round {
             }
         }
         for (Hand playerHand: playerHands) {
-            ArrayList<Integer> playersCardsTotalValues = playerHand.getTotalHandValue();
-
             if (playerHand.getHandStatus() == Hand.Status.BLACKJACK && dealerHand.getHandStatus() == Hand.Status.BLACKJACK) {
                 executePush();
             } else if (playerHand.getHandStatus() == Hand.Status.BLACKJACK && dealerHand.getHandStatus() != Hand.Status.BLACKJACK) {

@@ -1,5 +1,7 @@
 package org.mechanics;
 
+import org.mechanics.strategytables.S17Das;
+import org.mechanics.strategytables.StrategyTable;
 import java.util.Vector;
 
 public class Strategy{
@@ -7,60 +9,15 @@ public class Strategy{
     public enum strategyType {hardValue, softValue, split}
     public strategyType tableUsed = strategyType.hardValue;
     private String optimalPlay = "";
+    private StrategyTable strategyTable;
 
-    private static final String[][] hardTable = {
-            {"x","x","h","h","h","h","h","h","h","h","h","h"},
-            {"x","x","h","h","h","h","h","h","h","h","h","h"},
-            {"x","x","h","h","h","h","h","h","h","h","h","h"},
-            {"x","x","h","h","h","h","h","h","h","h","h","h"},
-            {"x","x","h","h","h","h","h","h","h","h","h","h"},
-            {"x","x","h","h","h","h","h","h","h","h","h","h"},
-            {"x","x","h","h","h","h","h","h","h","h","h","h"},
-            {"x","x","h","h","h","h","h","h","h","h","h","h"},
-            {"x","x","h","h","h","d","d","h","h","h","h","h"},
-            {"x","x","d","d","d","d","d","h","h","h","h","h"},
-            {"x","x","d","d","d","d","d","d","d","d","h","h"},
-            {"x","x","d","d","d","d","d","d","d","d","d","d"},
-            {"x","x","h","h","s","s","s","h","h","h","h","h"},
-            {"x","x","s","s","s","s","s","h","h","h","h","h"},
-            {"x","x","s","s","s","s","s","h","h","h","h","h"},
-            {"x","x","s","s","s","s","s","h","h","h","h","h"},
-            {"x","x","s","s","s","s","s","h","h","h","h","h"},
-            {"x","x","s","s","s","s","s","s","s","s","s","s"},
-            {"x","x","s","s","s","s","s","s","s","s","s","s"},
-            {"x","x","s","s","s","s","s","s","s","s","s","s"},
-            {"x","x","s","s","s","s","s","s","s","s","s","s"},
-            {"x","x","s","s","s","s","s","s","s","s","s","s"}
-    };
-
-    private static final String[][] softTable = {
-            {"x","x","x","x","x","x","x","x","x","x","x","x"},
-            {"x","x","x","x","x","x","x","x","x","x","x","x"},
-            {"x","x","h","h","d","d","d","h","h","h","h","h"},
-            {"x","x","h","h","d","d","d","h","h","h","h","h"},
-            {"x","x","h","h","d","d","d","h","h","h","h","h"},
-            {"x","x","h","h","d","d","d","h","h","h","h","h"},
-            {"x","x","d","d","d","d","d","h","h","h","h","h"},
-            {"x","x","s","d","d","d","d","s","s","h","h","s"},
-            {"x","x","s","s","s","s","d","s","s","s","s","s"},
-            {"x","x","s","s","s","s","s","s","s","s","s","s"},
-            {"x","x","s","s","s","s","s","s","s","s","s","s"}
-    };
-
-    private static final String[][] splitTable = {
-            {"x","x","x","x","x","x","x","x","x","x","x","x"},
-            {"x","x","p","p","p","p","p","p","h","h","h","h"},
-            {"x","x","p","p","p","p","p","p","h","h","h","h"},
-            {"x","x","p","p","p","p","p","p","p","h","h","h"},
-            {"x","x","h","h","h","h","h","h","h","h","h","h"},
-            {"x","x","d","d","d","d","d","d","d","d","h","h"},
-            {"x","x","p","p","p","p","p","h","h","h","h","h"},
-            {"x","x","p","p","p","p","p","p","h","h","h","h"},
-            {"x","x","p","p","p","p","p","p","p","p","p","p"},
-            {"x","x","p","p","p","p","p","s","p","p","s","s"},
-            {"x","x","s","s","s","s","s","s","s","s","s","s"},
-            {"x","x","p","p","p","p","p","p","p","p","p","p"}
-    };
+    /*
+     *  Strategy tables may be interchangeable between S17Das and S17NDas.
+     *   H17Das and H17NDas are currently supported.
+     */
+    private final String[][] hardTable = S17Das.hardTable;
+    private final String[][] softTable = S17Das.softTable;
+    private final String[][] splitTable = S17Das.splitTable;
 
     Hand playerHand;
     Hand dealerHand;
@@ -97,7 +54,6 @@ public class Strategy{
         // Else go with hard value strategies
         else {
             this.tableUsed = strategyType.hardValue;
-//            int playerHardValue = playerCards.getFirst().getCardValue() + playerCards.getLast().getCardValue();
             int bestPlayerHardValue = playerHand.getBestValue();
             optimalPlay = hardTable[bestPlayerHardValue][dealerCards.getFirst().getCardValue()];
         }
