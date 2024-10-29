@@ -39,3 +39,8 @@ tasks.named<Test>("test") {
     // Use TestNG for unit tests.
     useTestNG()
 }
+
+tasks.named<JavaExec>("run") {
+    standardInput = System.`in`
+}
+
