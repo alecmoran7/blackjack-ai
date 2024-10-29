@@ -150,12 +150,13 @@ public class Round {
             Strategy playerStrategy = new Strategy(playerHand, dealerHand);
             System.out.println("Best move: " + playerStrategy.getOptimalPlay());
 
-            String input = getNextMove(playerStrategy);
 
             if (playerHand.hasBlackJack()){
                 playerHand.setHandStatus(Hand.Status.BLACKJACK);
                 break;
             }
+
+            String input = getNextMove(playerStrategy);
 
             if (input.contains("d")) {
                 if (!firstMove) {
@@ -297,6 +298,7 @@ public class Round {
             return strategy.autoPlay();
         }
         else {
+            System.out.print("Enter your next move: ('h' for hit, 's' for stand, 'd' for double, 'p' for split): ");
             Scanner scanner = new Scanner(System.in);
             String input = scanner.nextLine();
             return input;

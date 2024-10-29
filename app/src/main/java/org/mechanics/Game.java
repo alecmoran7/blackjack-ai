@@ -9,7 +9,7 @@ public class Game {
         double gameResults = 0.0;
         double playerWager = 1.0;
 
-        while (numGamesPlayed < 1000000){
+        while (numGamesPlayed < 100000){
             try {
                 ++numGamesPlayed;
                 System.out.println("    Game #" + numGamesPlayed);

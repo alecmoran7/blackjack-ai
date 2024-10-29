@@ -38,7 +38,8 @@ public class S17NDas implements StrategyTable{
             {"x","x","s","d","d","d","d","s","s","h","h","h"}, // A-7
             {"x","x","s","s","s","s","d","s","s","s","s","s"}, // A-8
             {"x","x","s","s","s","s","s","s","s","s","s","s"}, // A-9
-            {"x","x","s","s","s","s","s","s","s","s","s","s"} // A-10
+            {"x","x","s","s","s","s","s","s","s","s","s","s"}, // A-10
+            {"x","x","p","p","p","p","p","p","p","p","p","p"}  // A-A
     };
 
     public static final String[][] splitTable = {
