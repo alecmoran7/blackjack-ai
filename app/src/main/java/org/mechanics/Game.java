@@ -8,33 +8,35 @@ public class Game {
     public Game(){
         double gameResults = 0.0;
         double playerWager = 1.0;
+        double numWins = 0.0;
+        double numLosses = 0.0;
+        int numGamesToPlay = 100000;
 
-        while (numGamesPlayed < 100000){
-            try {
+        while (numGamesPlayed < numGamesToPlay){
                 ++numGamesPlayed;
-                System.out.println("    Game #" + numGamesPlayed);
+//                System.out.println("    Game #" + numGamesPlayed);
                 Round round = new Round(deck, gameResults, playerWager);
-                gameResults = round.startGame();
-            }
-            catch (Exception e){
-                System.err.println("Error with running blackjack game");
-                e.printStackTrace();
-            }
-            System.out.println("Win (+) vs Loss (-) ratio: " + gameResults);
+                double gameResult = round.startGame();
+                if (gameResult > 0.0) {
+                    numWins += gameResult;
+                }
+                else if (gameResult < 0.0) {
+                    numLosses += Math.abs(gameResult);
+                }
+
             // Shuffle all cards (8 decks) every 20 games
             if(numGamesPlayed % 20 == 0){
-                System.out.println("Shuffling deck");
                 deck = new Deck();
             }
-
-            double netWins =  (numGamesPlayed / 2) + (gameResults/2);
-            double netLosses =  (numGamesPlayed / 2) - (gameResults/2);
-            System.out.println("Wins: " + netWins + ", Losses: " + netLosses);
-            winPercentage = netWins / numGamesPlayed;
-            System.out.println("Win percentage: " + winPercentage);
+            double progressAmount = ((double)numGamesPlayed / (double)numGamesToPlay) * 100;
+            if (progressAmount % 10 == 0){
+                System.out.println("Progress: " + progressAmount + "%");
+            }
         }
+        winPercentage = numWins / numGamesPlayed;
+        System.out.println("Wins: " + numWins + ", Losses: " + numLosses);
+        System.out.println("Win percentage: " + winPercentage * 100 + "%");
     }
-
 
     public static void main(String[] args){
         System.out.println("Starting game");
