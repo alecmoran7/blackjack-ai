@@ -46,48 +46,20 @@ public class Round {
 
     }
 
-    public void showAllCards(Cardholder cardHolder) {
-        int totalValue = 0;
-        int secondTotalValue = 0;
-        boolean containsAce = false;
-        ArrayList<String> cardIcons = new ArrayList<String>();
-        int cardNum = 0;
-        Vector<Card> cardsToShow = (cardHolder == Cardholder.Player) ? playerCards : dealerCards;
-        for (Card c : cardsToShow) {
-            cardIcons.add(c.getIcon());
-            if (c.isAce()) {
-                containsAce = true;
-            }
-        }
-
-        if (cardHolder == Cardholder.Player) {
-            System.out.println("Player has: " + cardIcons);
-        }
-        else if (cardHolder == Cardholder.Dealer) {
-            System.out.println("Dealer has: " + cardIcons);
-        }
-
-        if (containsAce) {
-            System.out.println("Soft totals: " + getTotalHandValue(cardHolder));
-        } else {
-            System.out.println("Hard total: " + getTotalHandValue(cardHolder));
-        }
-    }
-
     public void showDealerUpCard() {
         Card firstCard = dealerCards.getFirst();
         String cardIcon = firstCard.getIcon();
-        System.out.println("Dealer has: [" + cardIcon + ", ??]");
+        announceMessage("Dealer has: [" + cardIcon + ", ??]");
     }
 
     public void showDealerDownCard() {
         Card lastCard = dealerCards.getLast();
         String cardIcon = lastCard.getIcon();
-        System.out.println("Dealer reveals other card: " + cardIcon);
+        announceMessage("Dealer reveals other card: " + cardIcon);
     }
 
 
-    public double startGame() throws java.lang.InterruptedException {
+    public double startGame() {
 
         initializeRound();
 
@@ -103,7 +75,7 @@ public class Round {
 
     private void hit(Hand handToHit) {
         Card newCard = deck.getCard();
-        System.out.println("Hit -> " + newCard.getIcon());
+        announceMessage("Hit -> " + newCard.getIcon());
         handToHit.addCard(newCard);
     }
 
@@ -141,14 +113,16 @@ public class Round {
     }
 
     private Hand playHand(Hand playerHand){
-        playerHand.showAllCards();
+        if (!automateGame){
+            playerHand.showAllCards();
+        }
 
         ArrayList<Integer> playersCardsTotalValues = playerHand.getTotalHandValue();
         boolean firstMove = true;
 
         while (true) {
             Strategy playerStrategy = new Strategy(playerHand, dealerHand);
-            System.out.println("Best move: " + playerStrategy.getOptimalPlay());
+            announceMessage("AI's suggested move: " + playerStrategy.getOptimalPlay());
 
 
             if (playerHand.hasBlackJack()){
@@ -161,34 +135,36 @@ public class Round {
             if (input.contains("d")) {
                 if (!firstMove) {
                     input = "h";
-                    System.out.println("Optimal move with these cards is double, however doubling not allowed after first hit");
+                    announceMessage("Optimal move with these cards is double, however doubling not allowed after first hit");
                 }
                 else {
                     this.doubledDown = true;
                     hit(playerHand);
                     playersCardsTotalValues = playerHand.getTotalHandValue();
                     Collections.sort(playersCardsTotalValues);
-                    System.out.println("Player doubled down with : " + getBestValueFromHand(playersCardsTotalValues));
+                    announceMessage("Player doubled down with : " + getBestValueFromHand(playersCardsTotalValues));
                     break;
                 }
             }
             if (input.contains("h")) {
                 hit(playerHand);
                 firstMove = false;
-                playerHand.showAllCards();
+                if (!automateGame) {
+                    playerHand.showAllCards();
+                }
                 playersCardsTotalValues = playerHand.getTotalHandValue();
                 Collections.sort(playersCardsTotalValues);
                     if (playersCardsTotalValues.getFirst() == 21) {
-                    System.out.println("Player has 21");
+                    announceMessage("Player has 21");
                     playerHand.setHandStatus(Hand.Status.STAND);
                     break;
                 } else if (playersCardsTotalValues.getFirst() > 21) {
-                    System.out.println("Player busted with value: " + playersCardsTotalValues.getFirst());
+                    announceMessage("Player busted with value: " + playersCardsTotalValues.getFirst());
                     playerHand.setHandStatus(Hand.Status.BUSTED);
                     break;
                     }
             }  else if (input.contains("s")) {
-                System.out.println("Player stands with " + getBestValueFromHand(playersCardsTotalValues));
+                announceMessage("Player stands with " + getBestValueFromHand(playersCardsTotalValues));
                 playerHand.setHandStatus(Hand.Status.STAND);
                 break;
             } else if (input.contains("p")) {
@@ -202,7 +178,7 @@ public class Round {
                     this.playerSplitHand = new Hand(Cardholder.Player, secondHandCards, playerWager);
                 }
             } else {
-                System.out.println("Input not recognized, exiting");
+                announceMessage("Input not recognized, exiting");
                 System.exit(9);
             }
         }
@@ -221,7 +197,9 @@ public class Round {
             while (dealerHand.getHandStatus() == Hand.Status.PLAYING) {
                 if (dealersCardsTotalValues.getFirst() > 0 && dealersCardsTotalValues.getFirst() < 17) {
                     hit(dealerHand);
-                    dealerHand.showAllCards();
+                    if (!automateGame){
+                        dealerHand.showAllCards();
+                    }
                     dealersCardsTotalValues = dealerHand.getTotalHandValue();
                     Collections.sort(dealersCardsTotalValues);
                     continue;
@@ -229,13 +207,13 @@ public class Round {
                 //TODO: iterate through all values in dealer's soft totals if H17 is implemented in future
                 for (Integer totalValue : dealersCardsTotalValues) {
                     if (totalValue >= 17 && totalValue <= 21) {
-                        System.out.println("Dealer stands at " + getBestValueFromHand(dealersCardsTotalValues));
+                        announceMessage("Dealer stands at " + getBestValueFromHand(dealersCardsTotalValues));
                         dealerHand.setHandStatus(Hand.Status.STAND);
                         break;
                     }
                 }
                 if (dealersCardsTotalValues.getFirst() > 21) {
-                    System.out.println("Dealer busted with value: " + dealersCardsTotalValues.getFirst());
+                    announceMessage("Dealer busted with value: " + dealersCardsTotalValues.getFirst());
                     dealerHand.setHandStatus(Hand.Status.BUSTED);
                     break;
                 }
@@ -249,19 +227,19 @@ public class Round {
             } else if (playerHand.getHandStatus() != Hand.Status.BLACKJACK && dealerHand.getHandStatus() == Hand.Status.BLACKJACK) {
                 executePlayerLoss();
             } else if (playerHand.getHandStatus() == Hand.Status.BUSTED) {
-                System.out.println("Dealer wins");
+                announceMessage("Dealer wins");
                 playerCash = executePlayerLoss();
             } else if (dealerHand.getHandStatus() == Hand.Status.BUSTED) {
-                System.out.println("Player wins");
+                announceMessage("Player wins");
                 playerCash = executePlayerWin(1.0);
             } else if (dealerHand.getBestValue() > playerHand.getBestValue()) {
-                System.out.println("Dealer wins");
+                announceMessage("Dealer wins");
                 playerCash = executePlayerLoss();
             } else if (dealerHand.getBestValue() < playerHand.getBestValue()) {
-                System.out.println("Player wins");
+                announceMessage("Player wins");
                 playerCash = executePlayerWin(1.0);
             } else if (dealerHand.getBestValue() == playerHand.getBestValue()) {
-                System.out.println("Push");
+                announceMessage("Push");
                 executePush();
             }
 
@@ -302,6 +280,13 @@ public class Round {
             Scanner scanner = new Scanner(System.in);
             String input = scanner.nextLine();
             return input;
+        }
+    }
+
+    private void announceMessage(String message){
+        // Only print messages when running in non-automated mode to prevent system slowing down.
+        if (!automateGame){
+            System.out.println(message);
         }
     }
 

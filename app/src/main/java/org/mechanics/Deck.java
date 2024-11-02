@@ -7,8 +7,6 @@ import java.util.Collections;
 
 public class Deck {
 
-    //TODO: Construct methods to draw cards, shuffle, etc.
-
     private Vector<Card> cards;
 
     public Deck() {
@@ -89,12 +87,4 @@ public class Deck {
         return card;
     }
 
-    public void revealAllCards(){
-        int numberOfCardsRemaining = 0;
-        for (Card card : this.cards){
-            card.print();
-            numberOfCardsRemaining++;
-        }
-        System.out.println("Total number of cards remaining: " + numberOfCardsRemaining);
-    }
 }
